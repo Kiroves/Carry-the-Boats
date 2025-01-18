@@ -3,3 +3,7 @@ uvicorn
 websockets
 openai
 python-dotenv
+cv2
+mediapipe
+numpy
+time
