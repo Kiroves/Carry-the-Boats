@@ -1,10 +1,21 @@
-import { useState } from 'react'
+// import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const getTabInfo = () => {
+    chrome.tabs.query({}, (tabs) => {
+      const tabInfo = tabs.map(tab => ({
+        title: tab.title,
+        url: tab.url,
+        active: tab.active,
+        lastAccessed: tab.lastAccessed
+      }))
+      console.log('Tab Info:', tabInfo)
+    })
+  }
 
   return (
     <>
@@ -18,16 +29,10 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button onClick={getTabInfo}>
+          Log Tab Info
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
