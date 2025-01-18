@@ -30,3 +30,7 @@ uvicorn main:app --reload
 ```
 
 The server will be available at `http://127.0.0.1:8000`.
+
+## WebSocket Endpoint
+
+You can connect to the WebSocket endpoint at `ws://127.0.0.1:8000/ws`.
