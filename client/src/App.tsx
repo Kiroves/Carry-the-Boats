@@ -1,10 +1,8 @@
-// import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-
   const getTabInfo = () => {
     chrome.tabs.query({}, (tabs) => {
       const tabInfo = tabs.map(tab => ({
@@ -14,6 +12,14 @@ function App() {
         lastAccessed: tab.lastAccessed
       }))
       console.log('Tab Info:', tabInfo)
+
+      const ws = new WebSocket('ws://127.0.0.1:8000/ws')
+      ws.onopen = () => {
+        ws.send(JSON.stringify(tabInfo))
+      }
+      ws.onmessage = (event) => {
+        console.log('Message from server:', event.data)
+      }
     })
   }
 
