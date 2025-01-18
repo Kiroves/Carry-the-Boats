@@ -18,6 +18,8 @@ eye_closed_start_time = None
 left_right_start_time = None
 eye_closed_printed = False
 left_right_printed = False
+no_landmark_start_time = None
+no_landmark_printed = False
 
 # Function to detect if eyes are closed
 def are_eyes_closed(landmarks, threshold=0.010):
@@ -58,6 +60,17 @@ while cap.isOpened():
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     pose_results = pose.process(frame_rgb)
     face_results = face_mesh.process(frame_rgb)
+
+    # Check for no landmarks
+    if not pose_results.pose_landmarks and not face_results.multi_face_landmarks:
+        if no_landmark_start_time is None:
+            no_landmark_start_time = time.time()
+        elif (time.time() - no_landmark_start_time > 7) and not no_landmark_printed:
+            print("No landmark")
+            no_landmark_printed = True
+    else:
+        no_landmark_start_time = None
+        no_landmark_printed = False
 
     # Draw landmarks and analyze posture
     if pose_results.pose_landmarks:
