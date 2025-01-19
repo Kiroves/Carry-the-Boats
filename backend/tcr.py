@@ -48,7 +48,6 @@ async def scan(all: bool) -> None:
 
 import asyncio
 
-asyncio.run(scan(all=False))
 
 
 

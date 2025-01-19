@@ -1,7 +1,5 @@
 from tcr import get_hr
 import asyncio
-hr = asyncio.run(get_hr())
-print("hr", hr)
 import os
 import random
 import time
@@ -21,7 +19,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False, 'lastAccessed': 1737247392979.38}, {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True, 'lastAccessed': 1737247414909.144}, {'title': "LeetCode - The World's Leading Online Programming Learning Platform", 'url': 'https://leetcode.com/', 'active': False, 'lastAccessed': 1737247380386.886}, {'title': 'Inbox (1,398) - jason2580134@gmail.com - Gmail', 'url': 'https://mail.google.com/mail/u/0/#inbox', 'active': False, 'lastAccessed': 1737247384007.783}]
 
 client = OpenAI(api_key=openai_api_key)
-
+hr= 60
 log = []
 response = None
 previous_responses = []
@@ -33,7 +31,10 @@ cooldown = False
             
 @app.on_event("startup")
 async def startup_event():
-    tracker.start()  # Start tracking when the app starts
+    tracker.start() 
+    global hr
+    hr = await get_hr()
+    print("hr", hr)# Start tracking when the app starts
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -43,11 +44,11 @@ async def shutdown_event():
 async def update_tabs(request: Request):
     global tabs, log, new_tabs
     data = await request.json()
-    new_tabs = data.get("tabs", [])
+    new_tabs = data
     
 
 async def get_msg():
-    global response, previous_responses, log
+    global response, previous_responses, log, hr
     # use tabs and actions
     prompt = f"""
     You are a helpful dinosaur and assistant aiming to help the user be healthy on the internet.
@@ -150,20 +151,3 @@ async def websocket_endpoint(websocket: WebSocket):
         if response:
             await websocket.send_json({"response": response})
             response = None
-        await asyncio.sleep(4)
-
-def test():
-    global response, log
-    tracker.start()
-    try:
-        while True:
-            status = tracker.get_status()
-            if status:
-                log.append(status)
-                get_msg()  # Your existing message generation function
-            time.sleep(0.1)  # Small delay to prevent CPU overuse
-    finally:
-        tracker.stop()
-
-if __name__ == "__main__":
-    test()
