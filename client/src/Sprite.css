@@ -1,0 +1,17 @@
+.dino-sprite {
+    width: 24px;
+    /* Single frame width */
+    height: 24px;
+    /* Single frame height */
+    background: url('/public/dinosprite.png') no-repeat;
+    background-repeat: no-repeat;
+    background-size: auto;
+    /* Ensure scaling matches the sprite sheet */
+    margin: 10px auto;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig({
   plugins: [
@@ -19,7 +19,13 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: './index.html',
+        // content: './src/content.tsx', // Add content script entry
       },
-    },
-  },
-});
+      // output: {
+      //   entryFileNames: chunk => {
+      //     return chunk.name === 'content' ? 'content.js' : 'assets/[name]-[hash].js'
+      //   }
+      // }
+    }
+  }
+})
