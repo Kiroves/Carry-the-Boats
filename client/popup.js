@@ -18,31 +18,34 @@ function sendDinoMessage() {
     console.error('Error:', error);
   });
   console.log(messages[currentMessageIndex]);
-
 }
 
 function sendTabInfo() {
-  chrome.tabs.query({}, (tabs) => {
-    const tabInfos = tabs.map(currentTab => ({
-      title: currentTab.title,
-      url: currentTab.url,
-      isActive: currentTab.active,
-      windowId: currentTab.windowId
-    }));
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({}, (tabs) => {
+      const tabInfos = tabs.map(currentTab => ({
+        title: currentTab.title,
+        url: currentTab.url,
+        isActive: currentTab.active,
+        windowId: currentTab.windowId
+      }));
 
-    return fetch('http://localhost:8000/update_tabs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(tabInfos)
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Initial tab info sent:', data);
-    })
-    .catch(error => {
-      console.error('Error:', error);
+      fetch('http://localhost:8000/update_tabs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tabInfos)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Initial tab info sent:', data);
+        resolve();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        reject(error);
+      });
     });
   });
 }
