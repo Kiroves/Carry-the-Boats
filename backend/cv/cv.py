@@ -29,7 +29,7 @@ class PostureEyeTracker:
         self.status_queue = Queue()
         self.log = []
 
-    def are_eyes_closed(self, landmarks, threshold=0.015):
+    def are_eyes_closed(self, landmarks, threshold=0.013):
         max_eye_dist = float('-inf')
         min_eye_dist = float('inf')
         left_eye = [landmarks[159], landmarks[145]]
@@ -43,7 +43,7 @@ class PostureEyeTracker:
         avg_eye_dist = (left_eye_dist + right_eye_dist) / 2
         return avg_eye_dist < threshold
 
-    def is_moving_left_right(self, landmarks, left_right_threshold=0.10):
+    def is_moving_left_right(self, landmarks, left_right_threshold=0.15):
         nose = landmarks[self.mp_pose.PoseLandmark.NOSE.value].x
         return abs(nose - 0.5) > left_right_threshold
 

@@ -50,7 +50,7 @@ def get_msg():
     
     Output a short message to the user to help them be healthy on the internet.
     For example if action says no landmark, you could say "Where'd you go? "
-    If the action says uncentered, you could say "Remember to sit up straight! You don't want to end up with a stiff neck like a brontosaurus"
+    If the action says uncentered, you could say "Remember to sit up straight!"
     If the action says eyes closed, you could say "Wake up! You don't want to end up sleeping through an asteroid impact"
     If the user has spent a lot of time on youtube, you could tell them to spend some time being productive.
     If the user has spent a lot of time on work, you could tell the to be a break.
@@ -58,13 +58,13 @@ def get_msg():
     Don't talk about actions if it's empty.
     Limit the message to 1 or maybe 2 sentences. Keep is short and to the point, but funny.
     Try not to say the same thing as you said before. You will also be given up to 3 of your most recent responses
-    Remember that you are a dinosaur
+    Remember that you are a dinosaur and try to make dinosaur puns if possible.
     Only respond with the message and nothing else
     """
     
     userprompt = f"""
    "tabs": {tabs},
-    "log": {log},   
+    "log": {log[-1]},   
     "previous_responses": {previous_responses}
     """
 
@@ -81,6 +81,8 @@ def get_msg():
 
     response = completion.choices[0].message
     previous_responses.append(response)
+    if len(log) > 3:
+        log.pop(0)
     if len(previous_responses) > 3:
         previous_responses.pop(0)
 
