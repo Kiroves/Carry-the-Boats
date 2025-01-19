@@ -180,7 +180,7 @@ function sayAlert(message) {
 
   isAnimating = false;
 
-  const boxWidth = message.length < 20 ? window.innerWidth / 4 : window.innerWidth / 2 - frameWidth;
+  const boxWidth = message.length < 10 ? window.innerWidth / 4 - frameWidth : window.innerWidth / 2 - frameWidth;
 
   const textBubble = document.createElement('div');
   textBubble.innerText = message;  // Use the passed message instead of 'Hello, World!'
