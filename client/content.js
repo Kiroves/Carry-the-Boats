@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else if (request.action === 'sayAlert') {
         sayAlert(request.message);
     } else if (request.action === 'sayHello') {
-        sayAlert('Hello, World. I need this message to work correctly otherwise I am in big trouble. Please style correctly, please please please please please. I need this to work well otherwise I am losing focus, my mind, my sanity. Please god please.');
+        sayAlert("Hello World, I'm Blu!");
     }
 });
 
@@ -136,7 +136,7 @@ function sayAlert(message) {
 
     isAnimating = false;
 
-    const boxWidth = window.innerWidth / 2 - frameWidth;
+    const boxWidth = message.length < 20 ? window.innerWidth / 4 : window.innerWidth / 2 - frameWidth;
 
     const textBubble = document.createElement('div');
     textBubble.innerText = message;  // Use the passed message instead of 'Hello, World!'
@@ -148,8 +148,9 @@ function sayAlert(message) {
     textBubble.className = 'text-box';
     textBubble.style.fontFamily = 'ChiFont, sans-serif';
     textBubble.style.textAlign = direction === 1 ? 'left' : 'right';
-    textBubble.style.fontSize = '18px';  // Hardcoded font size
-    textBubble.style.letterSpacing = '-0.5px';  /* Add negative letter-spacing for tighter kerning */
+    textBubble.style.fontSize = '2rem';  // Increased font size
+    textBubble.style.fontWeight = 'bold';  // Make text bold
+    textBubble.style.letterSpacing = '-1.5px';  // Reduce space between characters
 
     document.body.appendChild(textBubble);
 
