@@ -2,14 +2,24 @@
     "manifest_version": 3,
     "name": "Focusaurus",
     "version": "1.0",
-    "description": "A Chrome extension to help you focus.",
+    "description": "Meet Blu, your friendly dinosaur companion who helps you stay focused and healthy while browsing!",
     "permissions": [
       "activeTab",
       "storage",
       "tabs"
     ],
+    "icons": {
+        "16": "public/dinologothumb.png",
+        "48": "public/dinologothumb.png",
+        "128":"public/dinologothumb.png"
+    },
     "action": {
-      "default_popup": "popup.html"
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "public/dinologothumb.png",
+        "48": "public/dinologothumb.png",
+        "128":"public/dinologothumb.png"
+      }
     },
     "background": {
       "service_worker": "background.js"
@@ -22,7 +32,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["public/dinosprite.png", "public/focusaurus.png", "public/chi.ttf"],
+        "resources": ["public/dinologo.png", "public/dinosprite.png", "public/focusaurus.png", "public/chi.ttf"],
         "matches": ["<all_urls>"]
       }
     ]
