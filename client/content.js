@@ -13,8 +13,9 @@ styleSheet.textContent = `
     background-color: #D1CEB2;
     border: 2px solid #000;
     padding: 1rem;
-    font-size: 0.9rem;
-    line-height: 1.4;
+    font-size: 22px;  /* Hardcoded font size */
+    line-height: 1.0;  /* Reduced from 1.4 */
+    letter-spacing: -1.0px;  /* Add negative letter-spacing for tighter kerning */
     box-shadow: 3px 3px 0 1px rgba(0, 0, 0, 0.3);
   }
 `;
@@ -25,6 +26,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         spawnDino();
     } else if (request.action === 'sayAlert') {
         sayAlert(request.message);
+    } else if (request.action === 'sayHello') {
+        sayAlert('Hello, World. I need this message to work correctly otherwise I am in big trouble. Please style correctly, please please please please please. I need this to work well otherwise I am losing focus, my mind, my sanity. Please god please.');
     }
 });
 
@@ -88,15 +91,20 @@ function sayAlert(message) {
 
     isAnimating = false;
 
+    const boxWidth = window.innerWidth / 2 - frameWidth;
+
     const textBubble = document.createElement('div');
     textBubble.innerText = message;  // Use the passed message instead of 'Hello, World!'
     textBubble.style.position = 'fixed';
     textBubble.style.bottom = `${frameWidth}px`;
-    textBubble.style.right = `${dinoRight + direction * frameWidth / 2}px`;
+    textBubble.style.right = `${(dinoRight + frameWidth / 2) < (window.innerWidth / 2) ? dinoRight + frameWidth : (dinoRight - boxWidth)}px`;
+    textBubble.style.width = `${boxWidth}px`;
     textBubble.style.zIndex = '9999';
     textBubble.className = 'text-box';
     textBubble.style.fontFamily = 'ChiFont, sans-serif';
     textBubble.style.textAlign = direction === 1 ? 'left' : 'right';
+    textBubble.style.fontSize = '18px';  // Hardcoded font size
+    textBubble.style.letterSpacing = '-0.5px';  /* Add negative letter-spacing for tighter kerning */
 
     document.body.appendChild(textBubble);
 
