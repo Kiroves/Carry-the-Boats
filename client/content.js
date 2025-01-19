@@ -88,14 +88,14 @@ function spawnDino() {
         animationInterval = setInterval(updateDinoFrame, 10); // Faster animation while dragging
     });
 
-    document.addEventListener('mousemove', (event) => {
+    dinoSprite.addEventListener('mousemove', (event) => {
         if (isDragging) {
             dinoSprite.style.right = `${window.innerWidth - event.clientX - dragOffsetX}px`;
             dinoSprite.style.bottom = `${window.innerHeight - event.clientY - dragOffsetY}px`;
         }
     });
 
-    document.addEventListener('mouseup', () => {
+    dinoSprite.addEventListener('mouseup', () => {
         if (isDragging) {
             isDragging = false;
             direction *= 1000000; // Multiply direction back
@@ -120,14 +120,14 @@ function spawnDino() {
     }
 
     // Optional: Add a way to stop/start animation
-    dinoSprite.addEventListener('click', () => {
-        isAnimating = !isAnimating; // Toggle animation state
-        if (isAnimating) {
-            console.log('Dinosaur animation resumed.');
-        } else {
-            console.log('Dinosaur animation paused.');
-        }
-    });
+    // dinoSprite.addEventListener('click', () => {
+    //     isAnimating = !isAnimating; // Toggle animation state
+    //     if (isAnimating) {
+    //         console.log('Dinosaur animation resumed.');
+    //     } else {
+    //         console.log('Dinosaur animation paused.');
+    //     }
+    // });
 }
 
 function sayAlert(message) {
