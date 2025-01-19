@@ -7,7 +7,7 @@ import random
 import time
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Request
 from openai import OpenAI
 
 from cv.cv import PostureEyeTracker  # Update import to use the new class
@@ -38,7 +38,19 @@ async def startup_event():
 async def shutdown_event():
     tracker.stop()  # Stop tracking when the app shuts down
     
-def get_msg():
+@app.post("/update_tabs")
+async def update_tabs(request: Request):
+    global tabs, log
+    data = await request.json()
+    new_tabs = data.get("tabs", [])
+    
+    # Check for new tabs
+    if new_tabs != tabs:
+        tabs = new_tabs
+        log = ["tab"]
+        await get_msg()  # Call get_msg when tabs change
+
+async def get_msg():
     global response, previous_responses, log
     # use tabs and actions
     prompt = f"""
@@ -120,22 +132,20 @@ async def websocket_endpoint(websocket: WebSocket):
     global response, tabs, log
     await websocket.accept()
 
+    async def append_heart_rate():
+        while True:
+            await asyncio.sleep(15)
+            log.append("heart_rate")
+            await get_msg()  # Call get_msg when heart_rate is appended to log
+
+    asyncio.create_task(append_heart_rate())
+
     while True:
-        data = await websocket.receive_json()
-        new_tabs = data.get("tabs", [])
-        
         # Check for new status
         status = tracker.get_status()
         if status:
             log.append(status)
-            get_msg()  # Call get_msg when log changes
-        
-        # Check for new tabs
-        if new_tabs != tabs:
-            tabs = new_tabs
-            log = ["tab"]
-            get_msg()  # Call get_msg when tabs change
-            
+            await get_msg()  # Call get_msg when log changes
         # Get message and send response
         if response:
             await websocket.send_json({"response": response})
