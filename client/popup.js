@@ -31,3 +31,19 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     .catch(error => console.error('Error:', error));
   });
 });
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'updateStatusBox') {
+    const statusBox = document.getElementById('statusBox');
+    statusBox.innerText = request.message;
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  chrome.storage.local.get('lastMessage', (data) => {
+    const statusBox = document.getElementById('statusBox');
+    if (data.lastMessage) {
+      statusBox.innerText = data.lastMessage;
+    }
+  });
+});

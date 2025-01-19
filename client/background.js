@@ -14,12 +14,16 @@ function sendDinoMessage() {
     console.log('Dino message sent:', data);
     currentMessageIndex = (currentMessageIndex + 1) % messages.length;
     
+    chrome.storage.local.set({ lastMessage: data.message.content });
+
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, { 
         action: 'sayAlert', 
         message: data.message.content 
       });
     });
+
+    chrome.runtime.sendMessage({ action: 'updateStatusBox', message: data.message.content });
   })
   .catch(error => {
     console.error('Error:', error);
