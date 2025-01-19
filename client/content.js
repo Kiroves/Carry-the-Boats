@@ -188,5 +188,5 @@ function sayAlert(message) {
   setTimeout(() => {
     document.body.removeChild(textBubble);
     isAnimating = true;
-  }, 2000);
+  }, 3000);
 }

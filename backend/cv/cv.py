@@ -23,7 +23,6 @@ class PostureEyeTracker:
         self.eye_closed_printed = False
         self.left_right_printed = False
         self.no_landmark_start_time = None
-        self.no_landmark_printed = False
         self.last_clear_time = time.time()
 
         # Thread control
@@ -67,13 +66,12 @@ class PostureEyeTracker:
             if not pose_results.pose_landmarks and not face_results.multi_face_landmarks:
                 if self.no_landmark_start_time is None:
                     self.no_landmark_start_time = time.time()
-                elif (time.time() - self.no_landmark_start_time > 7) and not self.no_landmark_printed:
+                elif (time.time() - self.no_landmark_start_time > 0.5):
                     self.status_queue.put("No landmark")
                     print("No landmark")
-                    self.no_landmark_printed = True
+                    self.no_landmark_start_time = time.time()  # Reset the start time to repeatedly add to the queue
             else:
                 self.no_landmark_start_time = None
-                self.no_landmark_printed = False
 
             # Process pose landmarks
             if pose_results.pose_landmarks:
@@ -83,22 +81,13 @@ class PostureEyeTracker:
                 moving_left_right = self.is_moving_left_right(
                     pose_results.pose_landmarks.landmark, left_right_threshold)
                 
-                if moving_left_right != self.previous_left_right_state:
-                    if moving_left_right:
-                        self.left_right_start_time = time.time()
-                    else:
-                        self.left_right_start_time = None
-                        self.left_right_printed = False
-                    self.previous_left_right_state = moving_left_right
-
-                if moving_left_right and self.left_right_start_time and (time.time() - self.left_right_start_time > 2):
-                    if not self.left_right_printed:
+                if moving_left_right:
+                    if self.left_right_start_time is None or (time.time() - self.left_right_start_time > 1):
                         self.status_queue.put("Uncentered")
                         print("Uncentered")
-                        self.left_right_printed = True
-                elif not moving_left_right:
-                    self.left_right_start_time = time.time()
-                    self.left_right_printed = False
+                        self.left_right_start_time = time.time()  # Reset the start time to repeatedly add to the queue
+                else:
+                    self.left_right_start_time = None
 
             # Process face landmarks
             if face_results.multi_face_landmarks:
@@ -119,13 +108,11 @@ class PostureEyeTracker:
                         self.previous_eye_state = eyes_closed
 
                     if eyes_closed and self.eye_closed_start_time and (time.time() - self.eye_closed_start_time > 2):
-                        if not self.eye_closed_printed:
-                            self.status_queue.put("Eyes Closed")
-                            print("Eyes Closed")
-                            self.eye_closed_printed = True
+                        self.status_queue.put("Eyes Closed")
+                        print("Eyes Closed")
+                        self.eye_closed_start_time = time.time()  # Reset the start time to repeatedly add to the queue
                     elif not eyes_closed:
-                        self.eye_closed_start_time = time.time()
-                        self.eye_closed_printed = False
+                        self.eye_closed_start_time = None
 
             # Clear log every 5 seconds
             if time.time() - self.last_clear_time > 5:

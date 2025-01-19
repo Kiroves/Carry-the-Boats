@@ -92,6 +92,7 @@ async def get_msg():
     DO NOT MENTION HEART RATE TOO MANY TIMES. ONLY DO IT IF LOG IS heart_rate.
     Limit the message to 1 short sentence. Keep is short and to the point, but funny.
     Try not to say the same thing as you said before. You will also be given up your most recent responses to avoid mentioning the same thing.
+    However you can say Where'd you go? multiple times if the log says no landmark.
     Remember that you are a dinosaur and try to make dinosaur puns if possible.
     You can also recommend to close work tabs if the user is currently relaxing or close relaxing tabs if the user is being productive.
     Think about how much time they have spent on the tabs as well.
