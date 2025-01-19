@@ -21,7 +21,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
     console.log(tabInfos);
 
-    fetch('http://localhost:8080/update_tabs', {
+    fetch('http://localhost:8000/update_tabs', {
       method: 'POST',
       headers: {
       'Content-Type': 'application/json'
