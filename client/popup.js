@@ -1,26 +1,29 @@
-// Create WebSocket connection
-const socket = new WebSocket('ws://localhost:8000/ws');
+const messages = ['heart_rate', 'tab', 'activity'];
+let currentMessageIndex = 0;
 
-socket.onopen = function(e) {
-  console.log('[WebSocket] Connection established');
-};
+function sendDinoMessage() {
+  fetch('http://localhost:8000/dino', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ action: messages[currentMessageIndex] })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Dino message sent:', data);
+    currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
 
-socket.onmessage = function(event) {
-  console.log('[WebSocket] Message received:', event.data);
-  // Handle incoming messages here
-};
+// Send first message immediately
+sendDinoMessage();
 
-socket.onerror = function(error) {
-  console.error('[WebSocket] Error:', error);
-};
-
-socket.onclose = function(event) {
-  if (event.wasClean) {
-    console.log(`[WebSocket] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-  } else {
-    console.log('[WebSocket] Connection died');
-  }
-};
+// Set up interval for subsequent messages
+setInterval(sendDinoMessage, 30000);
 
 document.getElementById('runAnimation').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {

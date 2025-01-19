@@ -45,7 +45,6 @@ async def update_tabs(request: Request):
     global tabs, log, new_tabs
     data = await request.json()
     new_tabs = data
-    
 
 async def get_msg():
     global response, previous_responses, log, hr
