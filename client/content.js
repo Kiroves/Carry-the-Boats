@@ -97,6 +97,7 @@ function sayHello() {
     textBubble.style.zIndex = '9999';
     textBubble.className = 'text-box';
     textBubble.style.fontFamily = 'ChiFont, sans-serif';
+    textBubble.style.textAlign = direction === 1 ? 'left' : 'right';
 
     document.body.appendChild(textBubble);
 
