@@ -37,5 +37,5 @@ function stopAnimation() {
   animationInterval = setInterval(updateSpriteFrame, 200);
 }
 
-document.getElementById('runAnimation').addEventListener('click', startAnimation);
-document.getElementById('stopAnimation').addEventListener('click', stopAnimation);
+// document.getElementById('runAnimation').addEventListener('click', startAnimation);
+// document.getElementById('stopAnimation').addEventListener('click', stopAnimation);

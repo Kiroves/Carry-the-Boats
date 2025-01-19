@@ -90,6 +90,7 @@
       padding: 1rem;
       margin-bottom: 1rem;
       min-height: 100px;
+      font-size: 1.5rem; /* Increased font size */
     }
 
     .start-button {
@@ -132,8 +133,8 @@
           Blu helps you stay mindful, keeps track of your tasks, and reminds you to take care of yourself.
         </div>
       </div>
-      <div class="status-box">
-        what he does kinda over here
+      <div class="status-box" id="statusBox">
+        Blu's last message will remain here until it goes extinct...
       </div>
       <div class="start-button" id="runAnimation">
         Start
@@ -146,8 +147,18 @@
     <button id="sendTabInfo">Send Tab Info</button> -->
   </div>
 
-
   <script src="index.js"></script>
   <script src="popup.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      chrome.storage.local.get('lastMessage', (data) => {
+        const statusBox = document.getElementById('statusBox');
+        if (data.lastMessage) {
+          statusBox.innerText = data.lastMessage;
+        }
+      });
+    });
+  </script>
 </body>
+</html>
 </html>
