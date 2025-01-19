@@ -1,7 +1,7 @@
 console.log("Focusaurus content script loaded.");
 
 // Add font and styles at the start of the file
-const styleSheet = document.createElement('style');
+const styleSheet = document.createElement("style");
 styleSheet.textContent = `
   @font-face {
     font-family: 'ChiFont';
@@ -22,25 +22,28 @@ styleSheet.textContent = `
 document.head.appendChild(styleSheet);
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'spawnDino') {
+  if (request.action === "spawnDino") {
     spawnDino();
-  } else if (request.action === 'sayAlert') {
+  } else if (request.action === "sayAlert") {
     sayAlert(request.message);
     chrome.storage.local.set({ lastMessage: request.message });
-    chrome.runtime.sendMessage({ action: 'updateStatusBox', message: request.message });
-  } else if (request.action === 'sayHello') {
+    chrome.runtime.sendMessage({
+      action: "updateStatusBox",
+      message: request.message,
+    });
+  } else if (request.action === "sayHello") {
     const message = "Hello World, I'm Blu!";
     sayAlert(message);
     chrome.storage.local.set({ lastMessage: message });
-    chrome.runtime.sendMessage({ action: 'updateStatusBox', message: message });
-    } else if (request.action === 'stopDino') {
-        stopDino();
+    chrome.runtime.sendMessage({ action: "updateStatusBox", message: message });
+  } else if (request.action === "stopDino") {
+    stopDino();
   }
 });
 
 let isAnimating = true; // Start with animation enabled
 let dinoRight = 0;
-let direction = 1; // Start moving left 
+let direction = 1; // Start moving left
 
 const frameWidth = 64; // Width of one frame in pixels
 
@@ -49,20 +52,28 @@ let dragOffsetX = 0;
 let dragOffsetY = 0;
 let animationInterval = null;
 
+const dragMessages = [
+  "Hey! Put me down! 😠",
+  "Ouch! That tickles!",
+  "Whoa, I'm getting dizzy! 😵‍💫",
+];
+
 function spawnDino() {
-  const existingDinoSprite = document.getElementById('focusaurus-dino'); // Use ID selector
+  const existingDinoSprite = document.getElementById("focusaurus-dino"); // Use ID selector
   if (existingDinoSprite) return;
   // Create a div for the dinosaur sprite
-  const dinoSprite = document.createElement('div');
-  dinoSprite.id = 'focusaurus-dino'; // Add unique ID
-  dinoSprite.style.width = '64px'; // Width of one frame
-  dinoSprite.style.height = '64px'; // Height of one frame
-  dinoSprite.style.backgroundImage = `url(${chrome.runtime.getURL("public/dinosprite.png")})`;
-  dinoSprite.style.backgroundRepeat = 'no-repeat';
-  dinoSprite.style.position = 'fixed';
-  dinoSprite.style.bottom = '0';
-  dinoSprite.style.right = '0';
-  dinoSprite.style.transform = 'scaleX(-1)';
+  const dinoSprite = document.createElement("div");
+  dinoSprite.id = "focusaurus-dino"; // Add unique ID
+  dinoSprite.style.width = "64px"; // Width of one frame
+  dinoSprite.style.height = "64px"; // Height of one frame
+  dinoSprite.style.backgroundImage = `url(${chrome.runtime.getURL(
+    "public/dinosprite.png"
+  )})`;
+  dinoSprite.style.backgroundRepeat = "no-repeat";
+  dinoSprite.style.position = "fixed";
+  dinoSprite.style.bottom = "0";
+  dinoSprite.style.right = "0";
+  dinoSprite.style.transform = "scaleX(-1)";
   document.body.appendChild(dinoSprite);
 
   // Animation state variables
@@ -79,7 +90,7 @@ function spawnDino() {
 
     if (currentRight < 0 || currentRight > window.innerWidth - frameWidth) {
       direction *= -1; // Reverse direction
-      dinoSprite.style.transform = direction === 1 ? 'scaleX(-1)' : 'scaleX(1)'; // Flip sprite
+      dinoSprite.style.transform = direction === 1 ? "scaleX(-1)" : "scaleX(1)"; // Flip sprite
     }
 
     dinoRight = currentRight;
@@ -89,26 +100,37 @@ function spawnDino() {
   // Start the animation loop
   animationInterval = setInterval(updateDinoFrame, 200); // Adjust timing for frame speed
 
-  dinoSprite.addEventListener('mousedown', (event) => {
+  dinoSprite.addEventListener("mousedown", (event) => {
     isDragging = true;
     dragOffsetX = event.clientX - dinoSprite.getBoundingClientRect().right + 90; // Adjust offset
-    dragOffsetY = event.clientY - dinoSprite.getBoundingClientRect().bottom + 75; // Adjust offset
+    dragOffsetY =
+      event.clientY - dinoSprite.getBoundingClientRect().bottom + 75; // Adjust offset
     direction /= 1000000; // Divide direction by 1,000,000
     clearInterval(animationInterval);
     animationInterval = setInterval(updateDinoFrame, 10); // Faster animation while dragging
+
+    // Show random drag message
+    const randomMessage =
+      dragMessages[Math.floor(Math.random() * dragMessages.length)];
+    sayAlert(randomMessage);
   });
 
-  document.addEventListener('mousemove', (event) => {
+  document.addEventListener("mousemove", (event) => {
     if (isDragging) {
       // Add boundary limits (100px from edges)
       const newRight = window.innerWidth - event.clientX - dragOffsetX;
-      const boundedRight = Math.min(Math.max(newRight, 100), window.innerWidth - frameWidth - 100);
+      const boundedRight = Math.min(
+        Math.max(newRight, 100),
+        window.innerWidth - frameWidth - 100
+      );
       dinoSprite.style.right = `${boundedRight}px`;
-      dinoSprite.style.bottom = `${window.innerHeight - event.clientY - dragOffsetY}px`;
+      dinoSprite.style.bottom = `${
+        window.innerHeight - event.clientY - dragOffsetY
+      }px`;
     }
   });
 
-  document.addEventListener('mouseup', () => {
+  document.addEventListener("mouseup", () => {
     if (isDragging) {
       isDragging = false;
       direction *= 1000000; // Multiply direction back
@@ -125,7 +147,7 @@ function spawnDino() {
         dinoSprite.style.bottom = `${currentBottom - 5}px`;
       } else {
         clearInterval(fallInterval);
-        dinoSprite.style.bottom = '0';
+        dinoSprite.style.bottom = "0";
         clearInterval(animationInterval);
         animationInterval = setInterval(updateDinoFrame, 200); // Ensure normal speed after falling
       }
@@ -144,57 +166,65 @@ function spawnDino() {
 }
 
 function resetGlobalState() {
-    isAnimating = true;
-    dinoRight = 0;
-    direction = 1;
-    isDragging = false;
-    dragOffsetX = 0;
-    dragOffsetY = 0;
-    animationInterval = null;
+  isAnimating = true;
+  dinoRight = 0;
+  direction = 1;
+  isDragging = false;
+  dragOffsetX = 0;
+  dragOffsetY = 0;
+  animationInterval = null;
 }
 
 function stopDino() {
-    const dinoSprite = document.getElementById('focusaurus-dino'); // Use ID selector
-    if (!dinoSprite) return;
+  const dinoSprite = document.getElementById("focusaurus-dino"); // Use ID selector
+  if (!dinoSprite) return;
 
-    isAnimating = false;
-    clearInterval(animationInterval);
+  isAnimating = false;
+  clearInterval(animationInterval);
 
-    // Play stop animation
-    let frame = 4; // Start frame for stop animation
-    const stopInterval = setInterval(() => {
-        dinoSprite.style.backgroundPosition = `-${frame * frameWidth}px 0`;
-        frame++;
-        if (frame >= 18) { // End of stop animation
-            clearInterval(stopInterval);
-            dinoSprite.remove();
-            resetGlobalState();
-            chrome.runtime.sendMessage({ action: 'cleanupExtension' });
-        }
-    }, 200);
+  // Play stop animation
+  let frame = 4; // Start frame for stop animation
+  const stopInterval = setInterval(() => {
+    dinoSprite.style.backgroundPosition = `-${frame * frameWidth}px 0`;
+    frame++;
+    if (frame >= 18) {
+      // End of stop animation
+      clearInterval(stopInterval);
+      dinoSprite.remove();
+      resetGlobalState();
+      chrome.runtime.sendMessage({ action: "cleanupExtension" });
+    }
+  }, 200);
 }
 
 function sayAlert(message) {
-    const dinoSprite = document.getElementById('focusaurus-dino'); // Use ID selector
-    if (!dinoSprite) return;
+  const dinoSprite = document.getElementById("focusaurus-dino"); // Use ID selector
+  if (!dinoSprite) return;
 
   isAnimating = false;
 
-  const boxWidth = message.length < 10 ? window.innerWidth / 4 - frameWidth : window.innerWidth / 2 - frameWidth;
+  const boxWidth =
+    message.length < 10
+      ? window.innerWidth / 4 - frameWidth
+      : window.innerWidth / 2 - frameWidth;
 
-  const textBubble = document.createElement('div');
-  textBubble.innerText = message;  // Use the passed message instead of 'Hello, World!'
-  textBubble.style.position = 'fixed';
+  const textBubble = document.createElement("div");
+  textBubble.innerText = message; // Use the passed message instead of 'Hello, World!'
+  textBubble.style.position = "fixed";
   textBubble.style.bottom = `${frameWidth}px`;
-  textBubble.style.right = `${(dinoRight + frameWidth / 2) < (window.innerWidth / 2) ? dinoRight + frameWidth : (dinoRight - boxWidth)}px`;
+  textBubble.style.right = `${
+    dinoRight + frameWidth / 2 < window.innerWidth / 2
+      ? dinoRight + frameWidth
+      : dinoRight - boxWidth
+  }px`;
   textBubble.style.width = `${boxWidth}px`;
-  textBubble.style.zIndex = '9999';
-  textBubble.className = 'text-box';
-  textBubble.style.fontFamily = 'ChiFont, sans-serif';
-  textBubble.style.textAlign = direction === 1 ? 'left' : 'right';
-  textBubble.style.fontSize = '1.6rem';  // Reduced from 2rem
-  textBubble.style.fontWeight = 'bold';  // Make text bold
-  textBubble.style.letterSpacing = '-1.5px';  // Reduce space between characters
+  textBubble.style.zIndex = "9999";
+  textBubble.className = "text-box";
+  textBubble.style.fontFamily = "ChiFont, sans-serif";
+  textBubble.style.textAlign = direction === 1 ? "left" : "right";
+  textBubble.style.fontSize = "1.6rem"; // Reduced from 2rem
+  textBubble.style.fontWeight = "bold"; // Make text bold
+  textBubble.style.letterSpacing = "-1.5px"; // Reduce space between characters
 
   document.body.appendChild(textBubble);
 
