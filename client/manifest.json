@@ -5,7 +5,8 @@
     "description": "A Chrome extension to help you focus.",
     "permissions": [
       "activeTab",
-      "storage"
+      "storage",
+      "tabs"
     ],
     "action": {
       "default_popup": "popup.html"
