@@ -5,8 +5,8 @@ place for accurate counting.
 We always set the time in UTC.
 """
 
-from datetime import datetime, timezone
 import logging
+from datetime import datetime, timezone
 
 from packet import make_packet
 

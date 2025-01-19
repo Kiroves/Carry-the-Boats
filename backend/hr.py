@@ -1,12 +1,12 @@
 """This is called the DailyHeartRate in Java."""
 
-from datetime import datetime, timezone, timedelta
-from dataclasses import dataclass
 import logging
 import struct
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 
-from packet import make_packet
 import date_utils
+from packet import make_packet
 
 CMD_READ_HEART_RATE = 21  # 0x15
 

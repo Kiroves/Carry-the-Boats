@@ -1,6 +1,7 @@
 import asyncio
-import websockets
 import json
+
+import websockets
 from dotenv import load_dotenv
 
 

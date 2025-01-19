@@ -4,17 +4,21 @@ A python client for connecting to the Colmi R02 Smart ring
 
 import csv
 import dataclasses
-from datetime import datetime, timezone, timedelta
-from io import StringIO
-from pathlib import Path
 import logging
 import time
+from datetime import datetime, timedelta, timezone
+from io import StringIO
+from pathlib import Path
 
 import asyncclick as click
+import date_utils
+import db
+import hr
+import pretty_print
+import real_time
+import steps
 from bleak import BleakScanner
-
 from client import Client
-import steps, pretty_print, db, date_utils, hr, real_time
 
 logging.basicConfig(level=logging.WARNING, format="%(name)s: %(message)s")
 

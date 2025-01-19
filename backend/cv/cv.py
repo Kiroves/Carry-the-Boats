@@ -1,9 +1,11 @@
-import cv2
-import mediapipe as mp
-import numpy as np
 import threading
 import time
 from queue import Queue
+
+import cv2
+import mediapipe as mp
+import numpy as np
+
 
 class PostureEyeTracker:
     def __init__(self):

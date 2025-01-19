@@ -1,7 +1,19 @@
-from bleak import BleakScanner
+import sys
+sys.coinit_flags = 0  # Set threading model to MTA before any other imports
+
+import os
+
+try:
+    from bleak.backends.winrt.util import uninitialize_sta
+    uninitialize_sta()  # Undo any unwanted STA initialization
+except ImportError:
+    pass  # Not on Windows or older Bleak version
+
 import real_time
+from bleak import BleakScanner
 from client import Client
 
+client_id=os.getenv("hr")
 DEVICE_NAME_PREFIXES = [
     "R01",
     "R02",
@@ -66,7 +78,7 @@ async def get_real_time(client: Client, reading: str) -> None:
 
 
 async def get_hr():
-    client = Client("98C4D00C-6BFB-F358-4A03-9FAEF6A90F4E")
+    client = Client(str(client_id))
     hr = await get_real_time(client, "heart-rate")
 
     avg_hr = sum(hr) / len(hr)

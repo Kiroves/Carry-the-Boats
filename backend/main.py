@@ -1,9 +1,23 @@
-from fastapi import FastAPI, WebSocket
-from cv.cv import PostureEyeTracker  # Update import to use the new class
-from openai import OpenAI
-from dotenv import load_dotenv
+import sys
+sys.coinit_flags = 0  # Set threading model to MTA before any other imports
+
+import asyncio
 import os
+import random
 import time
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket
+from openai import OpenAI
+
+try:
+    from bleak.backends.winrt.util import uninitialize_sta
+    uninitialize_sta()  # Undo any unwanted STA initialization
+except ImportError:
+    pass  # Not on Windows or older Bleak version
+
+from cv.cv import PostureEyeTracker
+from tcr import get_hr
 
 # Load the .env file
 load_dotenv()
@@ -33,7 +47,12 @@ async def shutdown_event():
     
 def get_msg():
     global response, previous_responses
-
+    try:
+        hr = asyncio.run(get_hr())
+    except Exception as e:
+        print(f"Failed to get HR: {e}")
+        hr = random.randint(60, 84)
+    print(hr)
     # use tabs and actions
     prompt = f"""
     You are a helpful dinosaur and assistant aiming to help the user be healthy on the internet.
@@ -48,24 +67,31 @@ def get_msg():
     If the action says eyes closed, that means the user eyes are closed
     If the action says No landmark, that means the user is away.
     
+    You will also be given the user's heart rate.
+    
     Output a short message to the user to help them be healthy on the internet.
     For example if action says no landmark, you could say "Where'd you go? "
     If the action says uncentered, you could say "Remember to sit up straight!"
     If the action says eyes closed, you could say "Wake up! You don't want to end up sleeping through an asteroid impact"
     If the user has spent a lot of time on youtube, you could tell them to spend some time being productive.
-    If the user has spent a lot of time on work, you could tell the to be a break.
+    If the user has spent a lot of time on work or their heart rate is high that could mean that they are stressed,
+    you could tell them to take a break.
     You don't need to address all the input data. Just pick one at random to talk about.
     Don't talk about actions if it's empty.
+    Don't talk about tabs if it's empty.
+    Don't talk about heart rate if it's empty.
     Limit the message to 1 or maybe 2 sentences. Keep is short and to the point, but funny.
     Try not to say the same thing as you said before. You will also be given up to 3 of your most recent responses
     Remember that you are a dinosaur and try to make dinosaur puns if possible.
+    You can mention multiple parts of the input data if you are able to in a concise manner.
     Only respond with the message and nothing else
     """
     
     userprompt = f"""
    "tabs": {tabs},
     "log": {log[-1]},   
-    "previous_responses": {previous_responses}
+    "previous_responses": {previous_responses},
+    "heart_rate": {hr}
     """
 
     completion = client.chat.completions.create(
@@ -76,7 +102,8 @@ def get_msg():
             "role": "user",
             "content": userprompt
         }
-    ]
+    ],
+    temperature=0.8
 )
 
     response = completion.choices[0].message

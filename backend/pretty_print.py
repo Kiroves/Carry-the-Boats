@@ -2,8 +2,8 @@
 Utility class for printing lists of lists, lists of dicts and lists of dataclasses
 """
 
-from typing import Any
 import dataclasses
+from typing import Any
 
 
 def print_lists(rows: list[list[Any]], header: bool = False) -> str:

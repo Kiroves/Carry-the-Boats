@@ -1,16 +1,24 @@
 import asyncio
-from collections.abc import Callable
-from datetime import datetime, timezone
-from dataclasses import dataclass
 import logging
+from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from types import TracebackType
 from typing import Any
 
+import battery
+import blink_twice
+import date_utils
+import hr
+import hr_settings
+import packet
+import real_time
+import reboot
+import set_time
+import steps
 from bleak import BleakClient
 from bleak.backends.characteristic import BleakGATTCharacteristic
-
-import battery, date_utils, steps, set_time, blink_twice, hr, hr_settings, packet, reboot, real_time
 
 UART_SERVICE_UUID = "6E40FFF0-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_RX_CHAR_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"

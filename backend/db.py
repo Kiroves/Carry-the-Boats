@@ -1,15 +1,16 @@
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
-import logging
 from typing import Any
-
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
-from sqlalchemy import select, UniqueConstraint, ForeignKey, create_engine, event, func, types
-from sqlalchemy.engine import Engine, Dialect
 
 import hr
 from client import FullData
-from date_utils import start_of_day, end_of_day
+from date_utils import end_of_day, start_of_day
+from sqlalchemy import (ForeignKey, UniqueConstraint, create_engine, event,
+                        func, select, types)
+from sqlalchemy.engine import Dialect, Engine
+from sqlalchemy.orm import (DeclarativeBase, Mapped, Session, mapped_column,
+                            relationship)
 
 logger = logging.getLogger(__name__)
 

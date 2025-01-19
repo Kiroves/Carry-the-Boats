@@ -6,8 +6,8 @@ An odd packet set up as it's either a query for the current settings or trying t
 I don't know what byte 1 in the response is.
 """
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 
 from packet import make_packet
 
