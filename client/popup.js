@@ -1,5 +1,4 @@
 document.getElementById('runAnimation').addEventListener('click', () => {
-  // alert('Stay focused!');
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, { action: 'spawnDino' });
   });
@@ -11,27 +10,30 @@ document.getElementById('sayHelloButton').addEventListener('click', () => {
   });
 });
 
-document.getElementById('sendTabInfo').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const currentTab = tabs[0];
-    const tabInfo = {
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  chrome.tabs.query({}, (tabs) => {
+    const tabInfos = tabs.map(currentTab => ({
       title: currentTab.title,
       url: currentTab.url,
       isActive: currentTab.active,
-      timestamp: new Date().toISOString(),
       windowId: currentTab.windowId
-    };
+    }));
 
-    const ws = new WebSocket('ws://localhost:8080/ws');
-    
-    ws.onopen = () => {
-      ws.send(JSON.stringify(tabInfo));
-      console.log('Tab info sent:', tabInfo);
-      ws.close();
-    };
+    console.log(tabInfos);
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+    fetch('http://localhost:8080/update_tabs', {
+      method: 'POST',
+      headers: {
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(tabInfos)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Tab info sent:', data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
   });
 });
