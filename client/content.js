@@ -34,6 +34,11 @@ let direction = 1; // Start moving left
 
 const frameWidth = 64; // Width of one frame in pixels
 
+let isDragging = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+let animationInterval = null;
+
 function spawnDino() {
     // Create a div for the dinosaur sprite
     const dinoSprite = document.createElement('div');
@@ -69,7 +74,47 @@ function spawnDino() {
     }
 
     // Start the animation loop
-    const animationInterval = setInterval(updateDinoFrame, 200); // Adjust timing for frame speed
+    animationInterval = setInterval(updateDinoFrame, 200); // Adjust timing for frame speed
+
+    dinoSprite.addEventListener('mousedown', (event) => {
+        isDragging = true;
+        dragOffsetX = event.clientX - dinoSprite.getBoundingClientRect().right + 90; // Adjust offset
+        dragOffsetY = event.clientY - dinoSprite.getBoundingClientRect().bottom + 75; // Adjust offset
+        direction /= 1000000; // Divide direction by 1,000,000
+        clearInterval(animationInterval);
+        animationInterval = setInterval(updateDinoFrame, 10); // Faster animation while dragging
+    });
+
+    document.addEventListener('mousemove', (event) => {
+        if (isDragging) {
+            dinoSprite.style.right = `${window.innerWidth - event.clientX - dragOffsetX}px`;
+            dinoSprite.style.bottom = `${window.innerHeight - event.clientY - dragOffsetY}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            direction *= 1000000; // Multiply direction back
+            clearInterval(animationInterval);
+            animationInterval = setInterval(updateDinoFrame, 200); // Restore normal animation speed
+            fallToBottom();
+        }
+    });
+
+    function fallToBottom() {
+        const fallInterval = setInterval(() => {
+            const currentBottom = parseInt(dinoSprite.style.bottom);
+            if (currentBottom > 0) {
+                dinoSprite.style.bottom = `${currentBottom - 5}px`;
+            } else {
+                clearInterval(fallInterval);
+                dinoSprite.style.bottom = '0';
+                clearInterval(animationInterval);
+                animationInterval = setInterval(updateDinoFrame, 200); // Ensure normal speed after falling
+            }
+        }, 50);
+    }
 
     // Optional: Add a way to stop/start animation
     dinoSprite.addEventListener('click', () => {

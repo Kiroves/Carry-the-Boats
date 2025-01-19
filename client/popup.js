@@ -61,7 +61,7 @@ function sendTabInfo() {
 // Send tab info first, then start dino messages
 sendTabInfo().then(() => {
   sendDinoMessage();
-  setInterval(sendDinoMessage, 4000);
+  setInterval(sendDinoMessage, 10000);
 });
 
 document.getElementById('runAnimation').addEventListener('click', () => {
