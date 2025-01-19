@@ -13,6 +13,14 @@ function sendDinoMessage() {
   .then(data => {
     console.log('Dino message sent:', data);
     currentMessageIndex = (currentMessageIndex + 1) % messages.length;
+    
+    // Forward message to content.js
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { 
+        action: 'sayAlert', 
+        message: data.message.content 
+      });
+    });
   })
   .catch(error => {
     console.error('Error:', error);

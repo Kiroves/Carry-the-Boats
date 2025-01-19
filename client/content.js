@@ -22,10 +22,9 @@ document.head.appendChild(styleSheet);
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'spawnDino') {
-        console.log('spawnDino')
         spawnDino();
-    } else if (request.action === 'sayHello') {
-        sayHello();
+    } else if (request.action === 'sayAlert') {
+        sayAlert(request.message);
     }
 });
 
@@ -83,14 +82,14 @@ function spawnDino() {
     });
 }
 
-function sayHello() {
+function sayAlert(message) {
     const dinoSprite = document.querySelector('div[style*="background-image"]');
     if (!dinoSprite) return;
 
     isAnimating = false;
 
     const textBubble = document.createElement('div');
-    textBubble.innerText = 'Hello, World!';
+    textBubble.innerText = message;  // Use the passed message instead of 'Hello, World!'
     textBubble.style.position = 'fixed';
     textBubble.style.bottom = `${frameWidth}px`;
     textBubble.style.right = `${dinoRight + direction * frameWidth / 2}px`;
