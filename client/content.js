@@ -50,9 +50,11 @@ let dragOffsetY = 0;
 let animationInterval = null;
 
 function spawnDino() {
+  const existingDinoSprite = document.getElementById('focusaurus-dino'); // Use ID selector
+  if (existingDinoSprite) return;
   // Create a div for the dinosaur sprite
   const dinoSprite = document.createElement('div');
-    dinoSprite.id = 'focusaurus-dino'; // Add unique ID
+  dinoSprite.id = 'focusaurus-dino'; // Add unique ID
   dinoSprite.style.width = '64px'; // Width of one frame
   dinoSprite.style.height = '64px'; // Height of one frame
   dinoSprite.style.backgroundImage = `url(${chrome.runtime.getURL("public/dinosprite.png")})`;
@@ -141,10 +143,19 @@ function spawnDino() {
   // });
 }
 
+function resetGlobalState() {
+    isAnimating = true;
+    dinoRight = 0;
+    direction = 1;
+    isDragging = false;
+    dragOffsetX = 0;
+    dragOffsetY = 0;
+    animationInterval = null;
+}
+
 function stopDino() {
     const dinoSprite = document.getElementById('focusaurus-dino'); // Use ID selector
     if (!dinoSprite) return;
-
 
     isAnimating = false;
     clearInterval(animationInterval);
@@ -157,6 +168,8 @@ function stopDino() {
         if (frame >= 18) { // End of stop animation
             clearInterval(stopInterval);
             dinoSprite.remove();
+            resetGlobalState();
+            chrome.runtime.sendMessage({ action: 'cleanupExtension' });
         }
     }, 200);
 }
@@ -167,7 +180,7 @@ function sayAlert(message) {
 
   isAnimating = false;
 
-  const boxWidth = message.length < 20 ? window.innerWidth / 4 : window.innerWidth / 2 - frameWidth;
+  const boxWidth = message.length < 10 ? window.innerWidth / 4 - frameWidth : window.innerWidth / 2 - frameWidth;
 
   const textBubble = document.createElement('div');
   textBubble.innerText = message;  // Use the passed message instead of 'Hello, World!'

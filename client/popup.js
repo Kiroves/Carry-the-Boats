@@ -9,11 +9,17 @@ document.getElementById('runAnimation').addEventListener('click', () => {
       chrome.tabs.sendMessage(tabs[0].id, { action: 'spawnDino' });
     });
   } else {
-    button.textContent = 'Start';
-    button.dataset.state = 'stopped';
+    button.disabled = true;  // Disable button
+    button.textContent = 'Stopping...';
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(tabs[0].id, { action: 'stopDino' });
     });
+    // Re-enable button and reset state after animation completes (~ 3 seconds)
+    setTimeout(() => {
+      button.disabled = false;
+      button.textContent = 'Start';
+      button.dataset.state = 'stopped';
+    }, 3000);
   }
 });
 
