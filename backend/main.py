@@ -25,6 +25,7 @@ client = OpenAI(api_key=openai_api_key)
 log = []
 response = None
 previous_responses = []
+new_tabs = []
 
 app = FastAPI()
 tracker = PostureEyeTracker()  # Create tracker instance
@@ -40,15 +41,10 @@ async def shutdown_event():
     
 @app.post("/update_tabs")
 async def update_tabs(request: Request):
-    global tabs, log
+    global tabs, log, new_tabs
     data = await request.json()
     new_tabs = data.get("tabs", [])
     
-    # Check for new tabs
-    if new_tabs != tabs:
-        tabs = new_tabs
-        log = ["tab"]
-        await get_msg()  # Call get_msg when tabs change
 
 async def get_msg():
     global response, previous_responses, log
@@ -96,7 +92,7 @@ async def get_msg():
     
     userprompt = f"""
    "tabs": {tabs},
-    "log": {log[-1]},   
+    "log": {log},   
     "previous_responses": {previous_responses},
     "heart_rate": {hr}
     """
@@ -129,7 +125,7 @@ def update_log():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    global response, tabs, log
+    global response, tabs, log, new_tabs
     await websocket.accept()
 
     async def append_heart_rate():
@@ -141,6 +137,10 @@ async def websocket_endpoint(websocket: WebSocket):
     asyncio.create_task(append_heart_rate())
 
     while True:
+        if new_tabs != tabs:
+            tabs = new_tabs
+            log.append("tab")
+            await get_msg()
         # Check for new status
         status = tracker.get_status()
         if status:
@@ -150,6 +150,7 @@ async def websocket_endpoint(websocket: WebSocket):
         if response:
             await websocket.send_json({"response": response})
             response = None
+        await asyncio.sleep(4)
 
 def test():
     global response, log
