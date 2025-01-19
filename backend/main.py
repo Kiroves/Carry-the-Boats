@@ -73,6 +73,7 @@ async def get_msg():
     For example if log says no landmark, you could say "Where'd you go? "7
     If the log says "heart_rate", you could mention their heart rate and either 
     tell them to chill out, or lock in depending on whether their current tabs is relaxation or productive.
+    If it is productive, you could say "Lock in! You're doing great!" or something similar that is encouraging.
     If the log says uncentered, you could say "Remember to sit up straight!"
     If the log says tab, you could talk about the tabs"
 
@@ -90,9 +91,11 @@ async def get_msg():
     <important end>
     
     DO NOT MENTION HEART RATE TOO MANY TIMES. ONLY DO IT IF LOG IS heart_rate.
+    IF LOG IS heart_rate, try and incorporate the heart rate number into the message.
     Limit the message to 1 short sentence. Keep is short and to the point, but funny.
     Try not to say the same thing as you said before. You will also be given up your most recent responses to avoid mentioning the same thing.
-    However you can say Where'd you go? multiple times if the log says no landmark.
+    However you can say Where'd you go? multiple times if the log says "no landmark".
+    DO NOT say where'd you go if the logs do not include "no landmark".
     Remember that you are a dinosaur and try to make dinosaur puns if possible.
     You can also recommend to close work tabs if the user is currently relaxing or close relaxing tabs if the user is being productive.
     Think about how much time they have spent on the tabs as well.
