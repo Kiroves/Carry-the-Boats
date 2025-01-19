@@ -21,7 +21,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["public/dinosprite.png"],
+        "resources": ["public/dinosprite.png", "public/focusaurus.png", "public/chi.ttf"],
         "matches": ["<all_urls>"]
       }
     ]

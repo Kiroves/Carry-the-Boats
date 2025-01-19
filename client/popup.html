@@ -3,6 +3,13 @@
 <head>
   <title>Focusaurus</title>
   <style>
+    @font-face {
+      font-family: 'ChiFont';
+      src: url('public/chi.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     .card {
       text-align: center;
       margin: 20px;
@@ -16,22 +23,122 @@
       margin: 10px auto;
     }
 
-    button {
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
+    .title {
+      font-size: 64px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    body {
+      font-family: 'ChiFont', sans-serif;
+      background-color: #FFF6DE;
+      height: 500px;
+      width: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #FFF6DE;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 400px;
+    }
+
+    .content {
+      background-color: #FFF6DE;
+      border: 4px solid #000;
+      padding: 1rem;
+      box-shadow: 6px 6px 0 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-section {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .character-box, .text-box {
+      background-color: #D1CEB2;
+      border: 2px solid #000;
+      padding: 1rem;
+    }
+
+    .character-box {
+      width: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 3px 3px 0 1px rgba(0, 0, 0, 0.3);
+    }
+
+    .text-box {
+      flex: 1;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .status-box {
+      background-color: #D1CEB2;
+      border: 2px solid #000;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      min-height: 100px;
+    }
+
+    .start-button {
+      background-color: #D1CEB2;
+      border: 2px solid #000;
+      padding: 0.8rem;
+      text-align: center;
+      font-size: 1.2rem;
       cursor: pointer;
+    }
+
+    .pixel-art {
+      image-rendering: pixelated;
+      width: 40px;
+      height: 40px;
     }
   </style>
 </head>
 <body>
-  <h1>Focusaurus</h1>
+  <!-- <h1 class="title"></h1>
   <button id="focusButton">Focus</button>
   <div class="card">
     <div class="dino-sprite" id="dinoSprite"></div>
     <button id="runAnimation">Run Dinosaur Animation</button>
     <button id="stopAnimation">Stop and Play Once</button>
+  </div> -->
+
+  <!--  -->
+
+  <div class="container">
+    <div class="title">
+      focus<span style="color: #4D92BC;">aurus</span>
+    </div>
+    <div class="content">
+      <div class="info-section">
+        <div class="character-box">
+          <div class="dino-sprite" id="dinoSprite"></div>
+        </div>
+        <div class="text-box">
+          Blu helps you stay mindful, keeps track of your tasks, and reminds you to take care of yourself.
+        </div>
+      </div>
+      <div class="status-box">
+        what he does kinda over here
+      </div>
+      <div class="start-button" id="runAnimation">
+        Start
+      </div>
+    </div>
   </div>
+
+
   <script src="index.js"></script>
 </body>
 </html>
