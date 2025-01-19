@@ -12,7 +12,7 @@ styleSheet.textContent = `
   .text-box {
     background-color: #D1CEB2;
     border: 2px solid #000;
-    padding: 1rem;
+    padding: 10px;
     font-size: 22px;  /* Hardcoded font size */
     line-height: 1.0;  /* Reduced from 1.4 */
     letter-spacing: -1.0px;  /* Add negative letter-spacing for tighter kerning */
@@ -74,6 +74,7 @@ function spawnDino() {
   dinoSprite.style.bottom = "0";
   dinoSprite.style.right = "0";
   dinoSprite.style.transform = "scaleX(-1)";
+  dinoSprite.style.zIndex = "2147483647"; // Maximum z-index value
   document.body.appendChild(dinoSprite);
 
   // Animation state variables
@@ -204,7 +205,7 @@ function sayAlert(message) {
   isAnimating = false;
 
   const boxWidth =
-    message.length < 10
+    message.length < 35
       ? window.innerWidth / 4 - frameWidth
       : window.innerWidth / 2 - frameWidth;
 
@@ -222,7 +223,7 @@ function sayAlert(message) {
   textBubble.className = "text-box";
   textBubble.style.fontFamily = "ChiFont, sans-serif";
   textBubble.style.textAlign = direction === 1 ? "left" : "right";
-  textBubble.style.fontSize = "1.6rem"; // Reduced from 2rem
+  textBubble.style.fontSize = "26px"; // Reduced from 2rem
   textBubble.style.fontWeight = "bold"; // Make text bold
   textBubble.style.letterSpacing = "-1.5px"; // Reduce space between characters
 
