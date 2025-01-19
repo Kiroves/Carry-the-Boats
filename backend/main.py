@@ -3,6 +3,7 @@ import asyncio
 import os
 import random
 import time
+import threading
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, Request
@@ -35,6 +36,7 @@ async def startup_event():
     global hr
     hr = await get_hr()
     print("hr", hr)# Start tracking when the app starts
+    start_log_thread()  # Start updating log with statuses in a separate thread
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -84,10 +86,10 @@ async def get_msg():
     If log is empty, or log is heart_rate, 
     but there's nothing unusual about the heart rate or 
     if log is tab, but you have already talk about every tab, 
-    say something funny or dinosaur related.
+    say something funny or dinosaur related instead of anything about the logs.
     <important end>
     
-    
+    DO NOT MENTION HEART RATE TOO MANY TIMES. ONLY DO IT IF LOG IS heart_rate.
     Limit the message to 1 short sentence. Keep is short and to the point, but funny.
     Try not to say the same thing as you said before. You will also be given up your most recent responses to avoid mentioning the same thing.
     Remember that you are a dinosaur and try to make dinosaur puns if possible.
@@ -130,6 +132,11 @@ def update_log():
             log.append(status)
         time.sleep(0.1)  # Small delay to prevent CPU overuse
 
+def start_log_thread():
+    log_thread = threading.Thread(target=update_log)
+    log_thread.daemon = True
+    log_thread.start()
+
 @app.post("/dino")
 async def dino(request: Request):
     global log
@@ -144,6 +151,7 @@ async def dino(request: Request):
         pass
 
     message = await get_msg()
+    log = []
     return {"message": message}
 
 @app.websocket("/ws")
