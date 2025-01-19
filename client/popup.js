@@ -21,11 +21,37 @@ function sendDinoMessage() {
 
 }
 
-// Send first message immediately
-sendDinoMessage();
+function sendTabInfo() {
+  chrome.tabs.query({}, (tabs) => {
+    const tabInfos = tabs.map(currentTab => ({
+      title: currentTab.title,
+      url: currentTab.url,
+      isActive: currentTab.active,
+      windowId: currentTab.windowId
+    }));
 
-// Set up interval for subsequent messages
-setInterval(sendDinoMessage, 4000);
+    return fetch('http://localhost:8000/update_tabs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(tabInfos)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Initial tab info sent:', data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+}
+
+// Send tab info first, then start dino messages
+sendTabInfo().then(() => {
+  sendDinoMessage();
+  setInterval(sendDinoMessage, 4000);
+});
 
 document.getElementById('runAnimation').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
