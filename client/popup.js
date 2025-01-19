@@ -1,7 +1,20 @@
 document.getElementById('runAnimation').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { action: 'spawnDino' });
-  });
+  const button = document.getElementById('runAnimation');
+  const currentState = button.dataset.state;
+  
+  if (currentState === 'stopped') {
+    button.textContent = 'Stop';
+    button.dataset.state = 'running';
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'spawnDino' });
+    });
+  } else {
+    button.textContent = 'Start';
+    button.dataset.state = 'stopped';
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'stopDino' });
+    });
+  }
 });
 
 document.getElementById('sayHelloButton').addEventListener('click', () => {

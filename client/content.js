@@ -33,6 +33,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sayAlert(message);
     chrome.storage.local.set({ lastMessage: message });
     chrome.runtime.sendMessage({ action: 'updateStatusBox', message: message });
+    } else if (request.action === 'stopDino') {
+        stopDino();
   }
 });
 
@@ -50,6 +52,7 @@ let animationInterval = null;
 function spawnDino() {
   // Create a div for the dinosaur sprite
   const dinoSprite = document.createElement('div');
+    dinoSprite.id = 'focusaurus-dino'; // Add unique ID
   dinoSprite.style.width = '64px'; // Width of one frame
   dinoSprite.style.height = '64px'; // Height of one frame
   dinoSprite.style.backgroundImage = `url(${chrome.runtime.getURL("public/dinosprite.png")})`;
@@ -138,9 +141,29 @@ function spawnDino() {
   // });
 }
 
+function stopDino() {
+    const dinoSprite = document.getElementById('focusaurus-dino'); // Use ID selector
+    if (!dinoSprite) return;
+
+
+    isAnimating = false;
+    clearInterval(animationInterval);
+
+    // Play stop animation
+    let frame = 4; // Start frame for stop animation
+    const stopInterval = setInterval(() => {
+        dinoSprite.style.backgroundPosition = `-${frame * frameWidth}px 0`;
+        frame++;
+        if (frame >= 18) { // End of stop animation
+            clearInterval(stopInterval);
+            dinoSprite.remove();
+        }
+    }, 200);
+}
+
 function sayAlert(message) {
-  const dinoSprite = document.querySelector('div[style*="background-image"]');
-  if (!dinoSprite) return;
+    const dinoSprite = document.getElementById('focusaurus-dino'); // Use ID selector
+    if (!dinoSprite) return;
 
   isAnimating = false;
 

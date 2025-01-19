@@ -56,6 +56,17 @@ function sendTabInfo() {
 sendTabInfo();
 sendDinoMessage();
 
+let dinoInterval;
+let tabInterval;
+
 // Set up intervals
-setInterval(sendDinoMessage, 10000);
-setInterval(sendTabInfo, 10000);
+dinoInterval = setInterval(sendDinoMessage, 10000);
+tabInterval = setInterval(sendTabInfo, 10000);
+
+// Add cleanup handler
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'cleanupExtension') {
+        clearInterval(dinoInterval);
+        clearInterval(tabInterval);
+    }
+});
