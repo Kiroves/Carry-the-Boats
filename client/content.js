@@ -90,7 +90,10 @@ function spawnDino() {
 
     document.addEventListener('mousemove', (event) => {
         if (isDragging) {
-            dinoSprite.style.right = `${window.innerWidth - event.clientX - dragOffsetX}px`;
+            // Add boundary limits (100px from edges)
+            const newRight = window.innerWidth - event.clientX - dragOffsetX;
+            const boundedRight = Math.min(Math.max(newRight, 100), window.innerWidth - frameWidth - 100);
+            dinoSprite.style.right = `${boundedRight}px`;
             dinoSprite.style.bottom = `${window.innerHeight - event.clientY - dragOffsetY}px`;
         }
     });
@@ -148,7 +151,7 @@ function sayAlert(message) {
     textBubble.className = 'text-box';
     textBubble.style.fontFamily = 'ChiFont, sans-serif';
     textBubble.style.textAlign = direction === 1 ? 'left' : 'right';
-    textBubble.style.fontSize = '2rem';  // Increased font size
+    textBubble.style.fontSize = '1.6rem';  // Reduced from 2rem
     textBubble.style.fontWeight = 'bold';  // Make text bold
     textBubble.style.letterSpacing = '-1.5px';  // Reduce space between characters
 
