@@ -6,6 +6,7 @@
     "permissions": [
       "activeTab",
       "storage",
+      "http://localhost:8000/*",
       "tabs"
     ],
     "action": {
