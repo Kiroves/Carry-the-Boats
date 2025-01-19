@@ -1,13 +1,4 @@
-import sys
-sys.coinit_flags = 0  # Set threading model to MTA before any other imports
-
 import os
-
-try:
-    from bleak.backends.winrt.util import uninitialize_sta
-    uninitialize_sta()  # Undo any unwanted STA initialization
-except ImportError:
-    pass  # Not on Windows or older Bleak version
 
 import real_time
 from bleak import BleakScanner
@@ -78,7 +69,7 @@ async def get_real_time(client: Client, reading: str) -> None:
 
 
 async def get_hr():
-    client = Client(str(client_id))
+    client = Client("32:31:44:31:CB:03")
     hr = await get_real_time(client, "heart-rate")
 
     avg_hr = sum(hr) / len(hr)

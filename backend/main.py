@@ -1,6 +1,3 @@
-import sys
-sys.coinit_flags = 0  # Set threading model to MTA before any other imports
-
 import asyncio
 import os
 import random
@@ -10,13 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket
 from openai import OpenAI
 
-try:
-    from bleak.backends.winrt.util import uninitialize_sta
-    uninitialize_sta()  # Undo any unwanted STA initialization
-except ImportError:
-    pass  # Not on Windows or older Bleak version
-
-from cv.cv import PostureEyeTracker
+from cv.cv import PostureEyeTracker  # Update import to use the new class
 from tcr import get_hr
 
 # Load the .env file
