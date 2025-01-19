@@ -1,3 +1,27 @@
+// Create WebSocket connection
+const socket = new WebSocket('ws://localhost:8000/ws');
+
+socket.onopen = function(e) {
+  console.log('[WebSocket] Connection established');
+};
+
+socket.onmessage = function(event) {
+  console.log('[WebSocket] Message received:', event.data);
+  // Handle incoming messages here
+};
+
+socket.onerror = function(error) {
+  console.error('[WebSocket] Error:', error);
+};
+
+socket.onclose = function(event) {
+  if (event.wasClean) {
+    console.log(`[WebSocket] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+  } else {
+    console.log('[WebSocket] Connection died');
+  }
+};
+
 document.getElementById('runAnimation').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, { action: 'spawnDino' });
