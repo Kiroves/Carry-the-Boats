@@ -16,7 +16,7 @@ load_dotenv()
 # Access the variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False, 'lastAccessed': 1737247392979.38}, {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True, 'lastAccessed': 1737247414909.144}, {'title': "LeetCode - The World's Leading Online Programming Learning Platform", 'url': 'https://leetcode.com/', 'active': False, 'lastAccessed': 1737247380386.886}, {'title': 'Inbox (1,398) - jason2580134@gmail.com - Gmail', 'url': 'https://mail.google.com/mail/u/0/#inbox', 'active': False, 'lastAccessed': 1737247384007.783}]
+tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False, 'lastAccessed': 1737247392979.38}, {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True, 'lastAccessed': 1737247414909.144}, {'title': "LeetCode - The World's Leading Online Programming Learning Platform", 'url': 'https://leetcode.com/', 'active': False, 'lastAccessed': 1737247380386.886}, {'title': 'Inbox (1,398) - jason2580134@gmail.com - Gmail', 'active': False, 'lastAccessed': 1737247384007.783}]
 
 client = OpenAI(api_key=openai_api_key)
 hr= 60
@@ -56,7 +56,8 @@ async def get_msg():
     Categorize each tab into one of the following categories:
         - productivity
         - relaxation
-    You will also be given a list of the user's actions.
+    You will also be given a list of the user's actions called log.
+    Prioritize the last action in log.
     
     If the action says uncentered, that means the user is not sitting straight
     If the action says eyes closed, that means the user eyes are closed
@@ -75,10 +76,6 @@ async def get_msg():
     If the user has spent a lot of time on youtube, you could tell them to spend some time being productive.
     If the user has spent a lot of time on work or their heart rate is high that could mean that they are stressed,
     you could tell them to take a break.
-    
-    Don't talk about actions if it's empty.
-    Don't talk about tabs if it's empty.
-    Don't talk about heart rate if it's empty.
     
     If the heart rate is high, you may but don't have to tell the user that they should chill out or relax. You can mention the tabs during this as well.
     Limit the message to 1 short sentence. Keep is short and to the point, but funny.
@@ -113,7 +110,7 @@ async def get_msg():
     log = []
     if len(previous_responses) > 4:
         previous_responses.pop(0)
-    print(response)
+    return response
 
 def update_log():
     global log
@@ -122,6 +119,23 @@ def update_log():
         if status:
             log.append(status)
         time.sleep(0.1)  # Small delay to prevent CPU overuse
+
+@app.post("/dino")
+async def dino(request: Request):
+    global log
+    data = await request.json()
+    action = data.get("action")
+
+    if action == "tab":
+        log = ["tab"]
+    elif action == "heart_rate":
+        log = ["heart_rate"]
+    elif action == "activity":
+        pass
+
+    message = await get_msg()
+    log = []
+    return {"message": message}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

@@ -17,13 +17,15 @@ function sendDinoMessage() {
   .catch(error => {
     console.error('Error:', error);
   });
+  console.log(messages[currentMessageIndex]);
+
 }
 
 // Send first message immediately
 sendDinoMessage();
 
 // Set up interval for subsequent messages
-setInterval(sendDinoMessage, 30000);
+setInterval(sendDinoMessage, 4000);
 
 document.getElementById('runAnimation').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
