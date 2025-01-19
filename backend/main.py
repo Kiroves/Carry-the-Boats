@@ -16,7 +16,7 @@ load_dotenv()
 # Access the variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False, 'lastAccessed': 1737247392979.38}, {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True, 'lastAccessed': 1737247414909.144}, {'title': "LeetCode - The World's Leading Online Programming Learning Platform", 'url': 'https://leetcode.com/', 'active': False, 'lastAccessed': 1737247380386.886}, {'title': 'Inbox (1,398) - jason2580134@gmail.com - Gmail', 'active': False, 'lastAccessed': 1737247384007.783}]
+tabs = []
 
 client = OpenAI(api_key=openai_api_key)
 hr= 60
@@ -47,7 +47,7 @@ async def update_tabs(request: Request):
     new_tabs = data
 
 async def get_msg():
-    global response, previous_responses, log, hr
+    global response, previous_responses, log, hr, tabs
     # use tabs and actions
     prompt = f"""
     You are a helpful dinosaur and assistant aiming to help the user be healthy on the internet.
@@ -59,25 +59,24 @@ async def get_msg():
     You will also be given a list of the user's actions called log.
     Prioritize the last action in log.
     
-    If the action says uncentered, that means the user is not sitting straight
-    If the action says eyes closed, that means the user eyes are closed
-    If the action says No landmark, that means the user is away.
+    If the log says uncentered, that means the user is not sitting straight
+    If the log says eyes closed, that means the user eyes are closed
+    If the log says No landmark, that means the user is away.
     
     You will also be given the user's heart rate.
     
     Output a short message to the user to help them be healthy on the internet.
-    For example if action says no landmark, you could say "Where'd you go? "7
-    If the action says "heart_rate", you could mention their heart rate and either 
+    For example if log says no landmark, you could say "Where'd you go? "7
+    If the log says "heart_rate", you could mention their heart rate and either 
     tell them to chill out, or lock in depending on whether their current tabs is relaxation or productive.
-    If the action says uncentered, you could say "Remember to sit up straight!"
-    If the action says tab, you could talk about the tabs"
+    If the log says uncentered, you could say "Remember to sit up straight!"
+    If the log says tab, you could talk about the tabs"
 
-    If the action says eyes closed, you could say "Wake up! You don't want to end up sleeping through an asteroid impact"
+    If the log says eyes closed, you could say "Wake up! You don't want to end up sleeping through an asteroid impact"
     If the user has spent a lot of time on youtube, you could tell them to spend some time being productive.
     If the user has spent a lot of time on work or their heart rate is high that could mean that they are stressed,
     you could tell them to take a break.
     
-    If the heart rate is high, you may but don't have to tell the user that they should chill out or relax. You can mention the tabs during this as well.
     Limit the message to 1 short sentence. Keep is short and to the point, but funny.
     Try not to say the same thing as you said before. You will also be given up your most recent responses to avoid mentioning the same thing.
     Remember that you are a dinosaur and try to make dinosaur puns if possible.
