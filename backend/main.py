@@ -79,6 +79,15 @@ async def get_msg():
     If the user has spent a lot of time on work or their heart rate is high that could mean that they are stressed,
     you could tell them to take a break.
     
+    IMPORTANT:
+    <important start>
+    If log is empty, or log is heart_rate, 
+    but there's nothing unusual about the heart rate or 
+    if log is tab, but you have already talk about every tab, 
+    say something funny or dinosaur related.
+    <important end>
+    
+    
     Limit the message to 1 short sentence. Keep is short and to the point, but funny.
     Try not to say the same thing as you said before. You will also be given up your most recent responses to avoid mentioning the same thing.
     Remember that you are a dinosaur and try to make dinosaur puns if possible.
@@ -109,7 +118,6 @@ async def get_msg():
 )
     response = completion.choices[0].message
     previous_responses.append(response)
-    log = []
     if len(previous_responses) > 4:
         previous_responses.pop(0)
     return response
@@ -136,7 +144,6 @@ async def dino(request: Request):
         pass
 
     message = await get_msg()
-    log = []
     return {"message": message}
 
 @app.websocket("/ws")
