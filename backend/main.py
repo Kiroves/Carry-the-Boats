@@ -16,4 +16,6 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         data = await websocket.receive_json()
         response = {"message": f"Received: {data}"}
+
+        print(data)
         await websocket.send_json(response)  # Send JSON object
