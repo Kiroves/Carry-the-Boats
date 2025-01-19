@@ -45,6 +45,8 @@ async def update_tabs(request: Request):
     global tabs, log, new_tabs
     data = await request.json()
     new_tabs = data
+    tabs = new_tabs  # Update tabs with new data
+    return {"hi": "hi"}
 
 async def get_msg():
     global response, previous_responses, log, hr, tabs
@@ -92,6 +94,7 @@ async def get_msg():
     "previous_responses": {previous_responses},
     "heart_rate": {hr}
     """
+    print("info", tabs, log, hr)
 
     completion = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -126,9 +129,9 @@ async def dino(request: Request):
     action = data.get("action")
 
     if action == "tab":
-        log = ["tab"]
+        log.append("tab")
     elif action == "heart_rate":
-        log = ["heart_rate"]
+        log.append("heart_rate")
     elif action == "activity":
         pass
 
