@@ -21,6 +21,15 @@ styleSheet.textContent = `
 `;
 document.head.appendChild(styleSheet);
 
+function checkDinoState() {
+  const dinoSprite = document.getElementById("focusaurus-dino");
+  const state = dinoSprite ? "running" : "stopped";
+  chrome.runtime.sendMessage({ action: "updateButtonState", state: state });
+}
+
+// Call the function when the content script is loaded
+checkDinoState();
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "spawnDino") {
     spawnDino();
@@ -38,6 +47,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.runtime.sendMessage({ action: "updateStatusBox", message: message });
   } else if (request.action === "stopDino") {
     stopDino();
+  } else if (request.action === "checkDinoState") {
+    checkDinoState();
   }
 });
 
@@ -81,22 +92,44 @@ function spawnDino() {
   let frame = 0; // Current frame
   const totalFrames = 4; // Number of frames in the sprite sheet
 
+  let pauseCounter = 0;
+
   // Function to update the sprite's frame
-  function updateDinoFrame() {
+function updateDinoFrame() {
     if (!isAnimating) return; // Stop updating if not animating
     dinoSprite.style.backgroundPosition = `-${frame * frameWidth}px 0`; // Move background position
     frame = (frame + 1) % totalFrames; // Cycle through frames
+
     let currentRight = parseInt(dinoSprite.style.right);
     currentRight += direction * 5;
 
+
+    // if (pauseCounter > 0) {
+    //     pauseCounter--;
+    // } else {
+    // }
+
+
     if (currentRight < 0 || currentRight > window.innerWidth - frameWidth) {
-      direction *= -1; // Reverse direction
-      dinoSprite.style.transform = direction === 1 ? "scaleX(-1)" : "scaleX(1)"; // Flip sprite
+        direction *= -1; // Reverse direction
+        dinoSprite.style.transform = direction === 1 ? "scaleX(-1)" : "scaleX(1)"; // Flip sprite
+    } else if (Math.random() < 0.05) {
+        // if (Math.random() < 0.5) {
+        //     if (pauseCounter === 0) {
+        //         console.log('Pausing for a bit');
+        //         pauseCounter = Math.round(Math.random() * 20);
+        //     }
+        // } else {
+       
+        // }
+
+        direction *= -1;
+        dinoSprite.style.transform = direction === 1 ? "scaleX(-1)" : "scaleX(1)"; // Flip sprite
     }
 
     dinoRight = currentRight;
     dinoSprite.style.right = `${currentRight}px`; // Move dinosaur
-  }
+}
 
   // Start the animation loop
   animationInterval = setInterval(updateDinoFrame, 200); // Adjust timing for frame speed
@@ -188,7 +221,7 @@ function stopDino() {
   const stopInterval = setInterval(() => {
     dinoSprite.style.backgroundPosition = `-${frame * frameWidth}px 0`;
     frame++;
-    if (frame >= 18) {
+    if (frame >= 20) {
       // End of stop animation
       clearInterval(stopInterval);
       dinoSprite.remove();

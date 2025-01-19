@@ -1,3 +1,16 @@
+const button = document.getElementById('runAnimation');
+const currentState = button.dataset.state;
+
+// check state
+// if (currentState === 'stopped') {
+//   button.textContent = 'Stop';
+// } else {
+//   button.textContent = 'Start';
+// }
+
+// set button text accordingly
+
+
 document.getElementById('runAnimation').addEventListener('click', () => {
   const button = document.getElementById('runAnimation');
   const currentState = button.dataset.state;
@@ -56,6 +69,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const statusBox = document.getElementById('statusBox');
     statusBox.innerText = request.message;
   }
+  if (request.action === 'updateButtonState') {
+    const button = document.getElementById('runAnimation');
+    if (request.state === 'running') {
+      button.textContent = 'Stop';
+      button.dataset.state = 'running';
+    } else {
+      button.textContent = 'Start';
+      button.dataset.state = 'stopped';
+    }
+  }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -64,5 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.lastMessage) {
       statusBox.innerText = data.lastMessage;
     }
+  });
+
+  // Request the dino state from the content script
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: 'checkDinoState' });
   });
 });
