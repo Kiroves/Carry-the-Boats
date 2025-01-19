@@ -1,9 +1,8 @@
 from fastapi import FastAPI, WebSocket
-from cv.cv import posture_and_eye_tracking
+from cv.cv import PostureEyeTracker  # Update import to use the new class
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-import threading
 import time
 
 # Load the .env file
@@ -12,9 +11,8 @@ load_dotenv()
 # Access the variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False, 'lastAccessed': 1737247392979.38}, {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True, 'lastAccessed': 1737247414909.144}, {'title': "LeetCode - The World's Leading Online Programming Learning Platform", 'url': 'https://leetcode.com/', 'active': False, 'lastAccessed': 1737247380386.886}, {'title': 'Inbox (1,398) - jason2580134@gmail.com - Gmail', 'active': False, 'lastAccessed': 1737247384007.783}] 
-
-tcr = False
+tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False},
+        {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True}]
 
 client = OpenAI(api_key=openai_api_key)
 
@@ -23,31 +21,28 @@ response = None
 previous_responses = []
 
 app = FastAPI()
+tracker = PostureEyeTracker()  # Create tracker instance
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.on_event("startup")
+async def startup_event():
+    tracker.start()  # Start tracking when the app starts
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
-
-# gets dinos msg
-# params: cv array
+@app.on_event("shutdown")
+async def shutdown_event():
+    tracker.stop()  # Stop tracking when the app shuts down
+    
 def get_msg():
-    response, previous_responses
+    global response, previous_responses
 
     # use tabs and actions
     prompt = f"""
     You are a helpful dinosaur and assistant aiming to help the user be healthy on the internet.
-    Here is the user's tab data:
-    Tabs: {tabs}
+    You will be given the user's browser tab data
     
     Categorize each tab into one of the following categories:
         - productivity
         - relaxation
-    Here is the user's actions:
-    Actions: {log}
+    You will also be given a list of the user's actions.
     
     If the action says uncentered, that means the user is not sitting straight
     If the action says eyes closed, that means the user eyes are closed
@@ -62,53 +57,72 @@ def get_msg():
     You don't need to address all the input data. Just pick one at random to talk about.
     Don't talk about actions if it's empty.
     Limit the message to 1 or maybe 2 sentences. Keep is short and to the point, but funny.
-    Try not to say the same thing as you said before. Here are up to 3 of your most recent responses: {previous_responses}
+    Try not to say the same thing as you said before. You will also be given up to 3 of your most recent responses
     Remember that you are a dinosaur
-    Only respond with the message and nothing else"""
+    Only respond with the message and nothing else
+    """
+    
+    userprompt = f"""
+   "tabs": {tabs},
+    "log": {log},   
+    "previous_responses": {previous_responses}
+    """
 
     completion = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
-            {"role": "system", "content": prompt},
-            {
-                "role": "user",
-                "content": "Write a haiku about recursion in programming."
-            }
-        ]
-    )
+        {"role": "system", "content": prompt},
+        {
+            "role": "user",
+            "content": userprompt
+        }
+    ]
+)
 
     response = completion.choices[0].message
     previous_responses.append(response)
     if len(previous_responses) > 3:
         previous_responses.pop(0)
 
+def update_log():
+    while True:
+        status = tracker.get_status()
+        if status:
+            log.append(status)
+        time.sleep(0.1)  # Small delay to prevent CPU overuse
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    global response
     await websocket.accept()
-
-    posture_and_eye_tracking(log)
-
+    
     while True:
         data = await websocket.receive_json()
         tabs = data.get("tabs", [])
-        previous_log = []
-        previous_tabs = tabs.copy()
-        if tabs != previous_tabs or log != previous_log:
-            get_msg()
-            previous_tabs = tabs.copy()
-            previous_log = log.copy()
+        
+        # Check for new status
+        status = tracker.get_status()
+        if status:
+            log.append(status)
+            
+        # Get message and send response
+        if response:
             await websocket.send_json({"response": response})
             response = None
-            
+
 def test():
-    posture_and_eye_tracking(log)
-    previous_log = []
-    previous_tabs = tabs.copy()
-    while True:
-        if tabs != previous_tabs or log != previous_log:
-            get_msg()
-            previous_tabs = tabs.copy()
-            previous_log = log.copy()
-            print(response)            
-            response = None
-test()
+    global response
+    tracker.start()
+    try:
+        while True:
+            status = tracker.get_status()
+            if status:
+                log.append(status)
+                get_msg()  # Your existing message generation function
+                print(response)
+            time.sleep(0.1)  # Small delay to prevent CPU overuse
+    finally:
+        tracker.stop()
+
+if __name__ == "__main__":
+    test()
