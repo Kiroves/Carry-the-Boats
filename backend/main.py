@@ -1,4 +1,7 @@
+from tcr import get_hr
 import asyncio
+hr = asyncio.run(get_hr())
+print("hr", hr)
 import os
 import random
 import time
@@ -8,7 +11,6 @@ from fastapi import FastAPI, WebSocket
 from openai import OpenAI
 
 from cv.cv import PostureEyeTracker  # Update import to use the new class
-from tcr import get_hr
 
 # Load the .env file
 load_dotenv()
@@ -16,8 +18,7 @@ load_dotenv()
 # Access the variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False},
-        {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True}]
+tabs = [{'title': 'Discord', 'url': 'https://discord.com/login', 'active': False, 'lastAccessed': 1737247392979.38}, {'title': 'YouTube', 'url': 'https://www.youtube.com/', 'active': True, 'lastAccessed': 1737247414909.144}, {'title': "LeetCode - The World's Leading Online Programming Learning Platform", 'url': 'https://leetcode.com/', 'active': False, 'lastAccessed': 1737247380386.886}, {'title': 'Inbox (1,398) - jason2580134@gmail.com - Gmail', 'url': 'https://mail.google.com/mail/u/0/#inbox', 'active': False, 'lastAccessed': 1737247384007.783}]
 
 client = OpenAI(api_key=openai_api_key)
 
@@ -27,7 +28,8 @@ previous_responses = []
 
 app = FastAPI()
 tracker = PostureEyeTracker()  # Create tracker instance
-
+cooldown = False
+            
 @app.on_event("startup")
 async def startup_event():
     tracker.start()  # Start tracking when the app starts
@@ -37,13 +39,7 @@ async def shutdown_event():
     tracker.stop()  # Stop tracking when the app shuts down
     
 def get_msg():
-    global response, previous_responses
-    try:
-        hr = asyncio.run(get_hr())
-    except Exception as e:
-        print(f"Failed to get HR: {e}")
-        hr = random.randint(60, 84)
-    print(hr)
+    global response, previous_responses, log
     # use tabs and actions
     prompt = f"""
     You are a helpful dinosaur and assistant aiming to help the user be healthy on the internet.
@@ -61,20 +57,28 @@ def get_msg():
     You will also be given the user's heart rate.
     
     Output a short message to the user to help them be healthy on the internet.
-    For example if action says no landmark, you could say "Where'd you go? "
+    For example if action says no landmark, you could say "Where'd you go? "7
+    If the action says "heart_rate", you could mention their heart rate and either 
+    tell them to chill out, or lock in depending on whether their current tabs is relaxation or productive.
     If the action says uncentered, you could say "Remember to sit up straight!"
+    If the action says tab, you could talk about the tabs"
+
     If the action says eyes closed, you could say "Wake up! You don't want to end up sleeping through an asteroid impact"
     If the user has spent a lot of time on youtube, you could tell them to spend some time being productive.
     If the user has spent a lot of time on work or their heart rate is high that could mean that they are stressed,
     you could tell them to take a break.
-    You don't need to address all the input data. Just pick one at random to talk about.
+    
     Don't talk about actions if it's empty.
     Don't talk about tabs if it's empty.
     Don't talk about heart rate if it's empty.
-    Limit the message to 1 or maybe 2 sentences. Keep is short and to the point, but funny.
-    Try not to say the same thing as you said before. You will also be given up to 3 of your most recent responses
+    
+    If the heart rate is high, you may but don't have to tell the user that they should chill out or relax. You can mention the tabs during this as well.
+    Limit the message to 1 short sentence. Keep is short and to the point, but funny.
+    Try not to say the same thing as you said before. You will also be given up your most recent responses to avoid mentioning the same thing.
     Remember that you are a dinosaur and try to make dinosaur puns if possible.
-    You can mention multiple parts of the input data if you are able to in a concise manner.
+    You can also recommend to close work tabs if the user is currently relaxing or close relaxing tabs if the user is being productive.
+    Think about how much time they have spent on the tabs as well.
+    Try not to talk about the same thing twice in general.
     Only respond with the message and nothing else
     """
     
@@ -96,15 +100,15 @@ def get_msg():
     ],
     temperature=0.8
 )
-
     response = completion.choices[0].message
     previous_responses.append(response)
-    if len(log) > 3:
-        log.pop(0)
-    if len(previous_responses) > 3:
+    log = []
+    if len(previous_responses) > 4:
         previous_responses.pop(0)
+    print(response)
 
 def update_log():
+    global log
     while True:
         status = tracker.get_status()
         if status:
@@ -113,17 +117,24 @@ def update_log():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    global response
+    global response, tabs, log
     await websocket.accept()
-    
+
     while True:
         data = await websocket.receive_json()
-        tabs = data.get("tabs", [])
+        new_tabs = data.get("tabs", [])
         
         # Check for new status
         status = tracker.get_status()
         if status:
             log.append(status)
+            get_msg()  # Call get_msg when log changes
+        
+        # Check for new tabs
+        if new_tabs != tabs:
+            tabs = new_tabs
+            log = ["tab"]
+            get_msg()  # Call get_msg when tabs change
             
         # Get message and send response
         if response:
@@ -131,7 +142,7 @@ async def websocket_endpoint(websocket: WebSocket):
             response = None
 
 def test():
-    global response
+    global response, log
     tracker.start()
     try:
         while True:
@@ -139,7 +150,6 @@ def test():
             if status:
                 log.append(status)
                 get_msg()  # Your existing message generation function
-                print(response)
             time.sleep(0.1)  # Small delay to prevent CPU overuse
     finally:
         tracker.stop()
