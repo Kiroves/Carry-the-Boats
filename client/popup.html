@@ -3,15 +3,35 @@
 <head>
   <title>Focusaurus</title>
   <style>
-    body {
-      width: 200px;
-      font-family: Arial, sans-serif;
+    .card {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .dino-sprite {
+      width: 64px; /* Frame width */
+      height: 64px; /* Frame height */
+      background-image: url('public/dinosprite.png'); /* Replace with your sprite sheet */
+      background-repeat: no-repeat;
+      margin: 10px auto;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h1>Focusaurus</h1>
   <button id="focusButton">Focus</button>
-  <script src="popup.js"></script>
+  <div class="card">
+    <div class="dino-sprite" id="dinoSprite"></div>
+    <button id="runAnimation">Run Dinosaur Animation</button>
+    <button id="stopAnimation">Stop and Play Once</button>
+  </div>
+  <script src="index.js"></script>
 </body>
 </html>

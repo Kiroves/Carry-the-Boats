@@ -8,3 +8,4 @@ blueSquare.style.position = 'fixed';
 blueSquare.style.bottom = '0';
 blueSquare.style.right = '0';
 document.body.appendChild(blueSquare);
+
