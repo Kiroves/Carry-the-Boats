@@ -1,5 +1,6 @@
 # Focusaurus
-Devpost: [https://devpost.com/software/focusaurus](https://devpost.com/software/focusaurus)
+Devpost: [https://devpost.com/software/focusaurus](https://devpost.com/software/focusaurus)\
+Youtube: [https://www.youtube.com/watch?v=HmPRmUPjOsA](https://www.youtube.com/watch?v=HmPRmUPjOsA)
 
 Meet Focusaurus! This friendly pocket-sized AI dinosaur isn’t just here to entertain—it’s here to care for your well-being and help you stay on track!
 ## Inspiration
