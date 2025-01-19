@@ -88,14 +88,14 @@ function spawnDino() {
         animationInterval = setInterval(updateDinoFrame, 10); // Faster animation while dragging
     });
 
-    dinoSprite.addEventListener('mousemove', (event) => {
+    document.addEventListener('mousemove', (event) => {
         if (isDragging) {
             dinoSprite.style.right = `${window.innerWidth - event.clientX - dragOffsetX}px`;
             dinoSprite.style.bottom = `${window.innerHeight - event.clientY - dragOffsetY}px`;
         }
     });
 
-    dinoSprite.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', () => {
         if (isDragging) {
             isDragging = false;
             direction *= 1000000; // Multiply direction back
