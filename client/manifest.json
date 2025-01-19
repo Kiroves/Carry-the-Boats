@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "Focusaurus",
+    "version": "1.0",
+    "description": "A Chrome extension to help you focus.",
+    "permissions": [
+      "activeTab",
+      "storage"
+    ],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["public/dinosprite.png"],
+        "matches": ["<all_urls>"]
+      }
+    ]
+  }
