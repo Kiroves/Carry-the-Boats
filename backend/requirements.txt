@@ -6,4 +6,3 @@ python-dotenv
 opencv-python
 mediapipe
 numpy
-time

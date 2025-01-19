@@ -3,7 +3,7 @@ import mediapipe as mp
 import numpy as np
 import time
 
-def posture_and_eye_tracking(callback):
+def posture_and_eye_tracking(log):
     # Mediapipe setup
     mp_pose = mp.solutions.pose
     mp_face_mesh = mp.solutions.face_mesh
@@ -13,20 +13,18 @@ def posture_and_eye_tracking(callback):
     # Variables to track states
     previous_left_right_state = None
     previous_eye_state = None
-    max_eye_dist = float('-inf')
-    min_eye_dist = float('inf')
     eye_closed_start_time = None
     left_right_start_time = None
     eye_closed_printed = False
     left_right_printed = False
     no_landmark_start_time = None
     no_landmark_printed = False
-    log = []
-    last_callback_time = time.time()
+    last_clear_time = time.time()
 
     # Function to detect if eyes are closed
-    def are_eyes_closed(landmarks, threshold=0.010):
-        global max_eye_dist, min_eye_dist
+    def are_eyes_closed(landmarks, threshold=0.015):
+        max_eye_dist = float('-inf')
+        min_eye_dist = float('inf')
         left_eye = [landmarks[159], landmarks[145]]  # Top and bottom points of left eye
         right_eye = [landmarks[386], landmarks[374]]  # Top and bottom points of right eye
 
@@ -41,7 +39,7 @@ def posture_and_eye_tracking(callback):
         return avg_eye_dist < threshold
 
     # Function to detect left/right movement
-    def is_moving_left_right(landmarks, left_right_threshold=0.05):
+    def is_moving_left_right(landmarks, left_right_threshold=0.10):
         nose = landmarks[mp_pose.PoseLandmark.NOSE.value].x
         return abs(nose - 0.5) > left_right_threshold
 
@@ -57,7 +55,7 @@ def posture_and_eye_tracking(callback):
             break
 
         # Set left/right threshold value
-        left_right_threshold = 0.05
+        left_right_threshold = 0.10
 
         # Process frame
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -126,11 +124,10 @@ def posture_and_eye_tracking(callback):
                     eye_closed_start_time = time.time()
                     eye_closed_printed = False
 
-        # Call the callback function every 10 seconds
-        if time.time() - last_callback_time > 10:
-            callback(log)
+        # Clear the log every 15 seconds
+        if time.time() - last_clear_time > 5:
             log.clear()
-            last_callback_time = time.time()
+            last_clear_time = time.time()
 
         # Show frame
         cv2.imshow('Posture and Eye Tracking', frame)

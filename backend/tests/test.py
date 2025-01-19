@@ -16,7 +16,7 @@ async def test_websocket():
         print("Response from server:", json.loads(response))  # Convert back to Python dict
 
 # Run the test
-# asyncio.run(test_websocket())
+asyncio.run(test_websocket())
 
 
 
