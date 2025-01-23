@@ -1,4 +1,4 @@
-# Focusaurus
+# 🦖 Focusaurus
 Devpost: [https://devpost.com/software/focusaurus](https://devpost.com/software/focusaurus)\
 Youtube: [https://www.youtube.com/watch?v=HmPRmUPjOsA](https://www.youtube.com/watch?v=HmPRmUPjOsA)
 
